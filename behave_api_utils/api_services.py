@@ -41,7 +41,7 @@ class APIRequestBase(object):
             URL of the service or proxy to test
         """
         self._base_url = base_url
-        self.api_url = '/'.join((self._base_url, api_url_path))
+        self.api_url = '/'.join((self._base_url, api_url_path)).rstrip('/')
         self.query_params = {}
         self._response = None
         self.response_json_dict = {}
@@ -92,7 +92,7 @@ class APIRequestBase(object):
         self.query_params = {}
 
     def get_json(self, endpoint_resource, custom_path=None, operation=RESTOperation.GET,
-                 headers=None):
+                 headers=None, payload=None):
         """
         Gets an endpoint resource output.
 
@@ -106,6 +106,8 @@ class APIRequestBase(object):
             in the endpoint. GET is the default option
         :param headers:
             (Optional) A dict object to specify additional headers
+        :param payload: 
+            (Optional) Dictionary representing the payload to send
         :return:
             A JSON representing the endpoint resource's output
         """
@@ -117,7 +119,7 @@ class APIRequestBase(object):
         if len(self.query_params) > 0:
             url = add_url_query_parameters(url, self.query_params)
 
-        self.response = send_request(operation, url, headers)
+        self.response = send_request(operation, url, headers, payload)
         self.clear_query_parameters()
 
         return self.response_json_dict
@@ -250,7 +252,7 @@ class ServicesAPIBase(APIRequestBase):
         raise NotImplementedError()
 
     def get_auth_output(self, endpoint_resource, custom_path=None, user_credentials=None,
-                        operation=RESTOperation.GET, headers=None):
+                        operation=RESTOperation.GET, headers=None, payload=None):
         """
         Gets an endpoint resource output. If no credentials are specified,
         the ones given on instance init will be used
@@ -269,13 +271,15 @@ class ServicesAPIBase(APIRequestBase):
             in the endpoint. GET is the default option
         :param headers:
             (Optional) A dict object to specify additional headers
+        :param payload: 
+            (Optional) Dictionary representing the payload to send
         :return:
             A JSON representing the endpoint resource's output
         """
         final_headers = self._merge_headers(self.get_authorization_headers(user_credentials),
                                             headers)
 
-        self.get_json(endpoint_resource, custom_path, operation, final_headers)
+        self.get_json(endpoint_resource, custom_path, operation, final_headers, payload)
         self.clear_query_parameters()
 
         return self.response_json_dict
