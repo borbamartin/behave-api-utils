@@ -20,7 +20,7 @@ class RESTOperation(Enum):
     def value(self):
         return self._name_
 
-    GET, POST, PUT, DELETE, PATCH, OPTIONS = range(6)
+    COPY, DELETE, GET, HEAD, LINK, LOCK, PATCH, POST, PURGE, PUT, OPTIONS, UNLINK = range(12)
 
 
 def send_request(rest_operation, url, headers=None, payload=None, **kwargs):
